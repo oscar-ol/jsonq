@@ -25,11 +25,11 @@ class Jsonq
         if (!is_null($jsonFile)) {
             $path = pathinfo($jsonFile);
             $extension = isset($path['extension']) ? $path['extension'] : null;
-            
+
             if ($extension != 'json') {
                 throw new InvalidJsonException();
             }
-            
+
             $this->import($jsonFile);
         }
     }
@@ -189,6 +189,54 @@ class Jsonq
             $value = $this->getFromNested($map, $column);
             if ($value) {
                 $data[$value][] = $map;
+            }
+        }
+
+        $this->_map = $data;
+        return $this;
+    }
+
+    /**
+     * getting group data from specific column with only first result
+     *
+     * @param string $column
+     * @return $this
+     * @throws ConditionNotAllowedException
+     */
+    public function firstGroupBy($column)
+    {
+        $this->prepare();
+
+        $data = [];
+        foreach ($this->_map as $map) {
+            $value = $this->getFromNested($map, $column);
+            if ($value) {
+                if (!isset($data[$value])){
+                    $data[$value] = $map;
+                }
+            }
+        }
+
+        $this->_map = $data;
+        return $this;
+    }
+
+    /**
+     * getting group data from specific column with only last result
+     *
+     * @param string $column
+     * @return $this
+     * @throws ConditionNotAllowedException
+     */
+    public function lastGroupBy($column)
+    {
+        $this->prepare();
+
+        $data = [];
+        foreach ($this->_map as $map) {
+            $value = $this->getFromNested($map, $column);
+            if ($value) {
+                $data[$value] = $map;
             }
         }
 
